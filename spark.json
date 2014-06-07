@@ -1,0 +1,7 @@
+{
+  "name": "OneWire",
+  "author": "Hotaman",
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "Dallas OneWire protocol support with ReadTemp example"
+}
