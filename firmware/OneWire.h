@@ -28,8 +28,9 @@
 #define ONEWIRE_CRC16 1
 #endif
 
-#define FALSE 0
-#define TRUE  1
+// TRUE and FALSE are defined by default on the Spark
+//#define FALSE 0
+//#define TRUE  1
 
 class OneWire
 {
