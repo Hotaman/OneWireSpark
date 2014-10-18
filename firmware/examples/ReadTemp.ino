@@ -1,5 +1,5 @@
 // This #include statement was automatically added by the Spark IDE.
-#include "OneWire.h"
+#include "OneWire/OneWire.h"
 
 // OneWire DS18S20, DS18B20, DS1822, DS2438 Temperature Example
 //
