@@ -1,8 +1,8 @@
 // Use this include for the Web IDE:
-#include "Particle-OneWire/Particle-OneWire.h"
+#include "OneWire/OneWire.h"
 
 // Use this include for Particle Dev where everything is in one directory.
-// #include "Particle-OneWire.h"
+// #include "OneWire.h"
 
 // This library can be tested on the Core/Photon by running the below
 // DS18x20 example from PJRC:
