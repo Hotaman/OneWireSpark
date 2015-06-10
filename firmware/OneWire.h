@@ -2,13 +2,7 @@
 #define OneWire_h
 
 #include <inttypes.h>
-
-
-#ifdef STM32F10X_MD
-   #include "spark_wiring.h"
-   #include "spark_wiring_interrupts.h"
-#endif
-
+#include "application.h"
 
 // you can exclude onewire_search by defining that to 0
 #ifndef ONEWIRE_SEARCH
@@ -29,19 +23,105 @@
 #endif
 
 // TRUE and FALSE are defined by default on the Spark
-//#define FALSE 0
-//#define TRUE  1
+// #define FALSE 0
+// #define TRUE  1
 
 class OneWire
 {
-  private:
-  
-	uint16_t _pin;
-	void DIRECT_WRITE_LOW(void);
-	void DIRECT_MODE_OUTPUT(void);
-	void DIRECT_WRITE_HIGH(void);
-	void DIRECT_MODE_INPUT(void);
-	uint8_t DIRECT_READ(void);
+private:
+  uint16_t _pin;
+
+/**************Conditional fast pin access for Core and Photon*****************/
+  #if PLATFORM_ID == 0 // Core
+    inline void digitalWriteFastLow() {
+      PIN_MAP[_pin].gpio_peripheral->BRR = PIN_MAP[_pin].gpio_pin;
+    }
+
+    inline void digitalWriteFastHigh() {
+      PIN_MAP[_pin].gpio_peripheral->BSRR = PIN_MAP[_pin].gpio_pin;
+    }
+
+    inline void pinModeFastOutput() {
+      GPIO_TypeDef *gpio_port = PIN_MAP[_pin].gpio_peripheral;
+      uint16_t gpio_pin = PIN_MAP[_pin].gpio_pin;
+
+      GPIO_InitTypeDef GPIO_InitStructure;
+
+      if (gpio_port == GPIOA )
+      {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+      }
+      else if (gpio_port == GPIOB )
+      {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+      }
+
+      GPIO_InitStructure.GPIO_Pin = gpio_pin;
+      GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+      GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+      PIN_MAP[_pin].pin_mode = OUTPUT;
+      GPIO_Init(gpio_port, &GPIO_InitStructure);
+    }
+
+    inline void pinModeFastInput() {
+      GPIO_TypeDef *gpio_port = PIN_MAP[_pin].gpio_peripheral;
+      uint16_t gpio_pin = PIN_MAP[_pin].gpio_pin;
+
+      GPIO_InitTypeDef GPIO_InitStructure;
+
+      if (gpio_port == GPIOA )
+      {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+      }
+      else if (gpio_port == GPIOB )
+      {
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+      }
+
+      GPIO_InitStructure.GPIO_Pin = gpio_pin;
+      GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+      PIN_MAP[_pin].pin_mode = INPUT;
+      GPIO_Init(gpio_port, &GPIO_InitStructure);
+    }
+
+    inline uint8_t digitalReadFast() {
+      return GPIO_ReadInputDataBit(PIN_MAP[_pin].gpio_peripheral, PIN_MAP[_pin].gpio_pin);
+    }
+
+  #elif PLATFORM_ID == 6 // Photon
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map(); // Pointer required for highest access speed
+
+    inline void digitalWriteFastLow() {
+      PIN_MAP[_pin].gpio_peripheral->BSRRH = PIN_MAP[_pin].gpio_pin;
+    }
+
+    inline void digitalWriteFastHigh() {
+      PIN_MAP[_pin].gpio_peripheral->BSRRL = PIN_MAP[_pin].gpio_pin;
+    }
+
+    inline void pinModeFastOutput(void){
+      // This could probably be speed up by digging a little deeper past
+      // the HAL_Pin_Mode function.
+      HAL_Pin_Mode(_pin, OUTPUT);
+    }
+
+    inline void pinModeFastInput(void){
+      // This could probably be speed up by digging a little deeper past
+      // the HAL_Pin_Mode function.
+      HAL_Pin_Mode(_pin, INPUT);
+    }
+
+    inline uint8_t digitalReadFast(void){
+      // This could probably be speed up by digging a little deeper past
+      // the HAL_GPIO_Read function.
+      return HAL_GPIO_Read(_pin);
+    }
+
+  #else
+    #error "*** PLATFORM_ID not supported by this library. PLATFORM should be Core or Photon ***"
+  #endif
+/**************End conditional fast pin access for Core and Photon*************/
+
 #if ONEWIRE_SEARCH
     // global search state
     unsigned char ROM_NO[8];
