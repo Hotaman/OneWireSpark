@@ -89,13 +89,7 @@ void loop(void) {
   
   present = ds.reset();
   ds.select(addr);    
-  ds.write(0xB8,0);         // Recall Memory 0
-  ds.write(0x00,0);         // Recall Memory 0
-
-  present = ds.reset();
-  ds.select(addr);    
   ds.write(0xBE, 0);         // Read Scratchpad 0
-  ds.write(0x00,0);         // Recall Memory 0
 
   Serial.print("  Data = ");
   Serial.print(present, HEX);
