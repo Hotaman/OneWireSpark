@@ -1,4 +1,4 @@
-Now testing support for Electron. Will update RSN.
+Now supporting P1 and Electron.
 
 
 OneWireSpark

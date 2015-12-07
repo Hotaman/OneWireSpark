@@ -88,7 +88,7 @@ private:
       return GPIO_ReadInputDataBit(PIN_MAP[_pin].gpio_peripheral, PIN_MAP[_pin].gpio_pin);
     }
 
-  #elif PLATFORM_ID == 6 // Photon
+  #elif PLATFORM_ID == 6 || PLATFORM_ID == 8 || PLATFORM_ID == 10 // Photon,P1,Electron
     STM32_Pin_Info* PIN_MAP = HAL_Pin_Map(); // Pointer required for highest access speed
 
     inline void digitalWriteFastLow() {
@@ -118,7 +118,7 @@ private:
     }
 
   #else
-    #error "*** PLATFORM_ID not supported by this library. PLATFORM should be Core or Photon ***"
+    #error "*** PLATFORM_ID not supported by this library. PLATFORM should be Core, Photon, P1 or Electron ***"
   #endif
 /**************End conditional fast pin access for Core and Photon*************/
 
@@ -205,8 +205,8 @@ private:
     //    ReadBytes(net, buf+3, 10);  // Read 6 data bytes, 2 0xFF, 2 CRC16
     //    if (!CheckCRC16(buf, 11, &buf[11])) {
     //        // Handle error.
-    //    }     
-    //          
+    //    }
+    //
     // @param input - Array of bytes to checksum.
     // @param len - How many bytes to use.
     // @param inverted_crc - The two CRC16 bytes in the received data.
@@ -234,4 +234,3 @@ private:
 };
 
 #endif
-
