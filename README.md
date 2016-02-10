@@ -1,16 +1,15 @@
 
-Now supporting P1 and Electron.
+Now supporting ALL Particle devices.
 
 
 OneWireSpark
 ============
 
-Provides support for the Dallas One Wire protocol on the Spark core.
-
-I have made minor tweeks to the work of many others and collected it
-here for use within the web build tool.
+Provides support for the Dallas One Wire protocol on Particle devices.
 
 Simply click the libs button in the web build tool at spark.io
 and add this lib to your project.
 
-Refer to the ReadTemp.ino example code for basic use of the lib.
+Note that you need to remove the lib then re-add it to update to the latest version!
+
+Refer to the example code for basic use of the lib.

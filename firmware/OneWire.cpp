@@ -1,7 +1,12 @@
 /*
-Update Web IDE lib.
 
 Particle Verison of OneWire Libary
+
+Hotaman 2/1/2016
+Bit and Byte write functions have been changed to only drive the bus high at the end of a byte when requested.
+They no longer drive the bus for High bits when outputting to avoid a holy war.
+Some folks just can't accept that a 10K resistor works just fine when the calculation calls for 10,042.769 ohms.
+Bit and Byte writes are now 100% compliant with specs and app notes.
 
 Support for P1 and Electron added by Hotaman 11/30/2015
 
@@ -198,7 +203,7 @@ void OneWire::write_bit(uint8_t v)
 
         delayMicroseconds(10);
 
-        digitalWriteFastHigh();    // drive output high
+        pinModeFastInput();    // float high
 
         interrupts();
 
@@ -211,7 +216,7 @@ void OneWire::write_bit(uint8_t v)
 
         delayMicroseconds(65);
 
-        digitalWriteFastHigh();    // drive output high
+        pinModeFastInput();    // float high
 
         interrupts();
 
@@ -229,8 +234,8 @@ uint8_t OneWire::read_bit(void)
 
     noInterrupts();
 
-    pinModeFastOutput();
     digitalWriteFastLow();
+    pinModeFastOutput();
 
     delayMicroseconds(3);
 
@@ -261,11 +266,11 @@ void OneWire::write(uint8_t v, uint8_t power /* = 0 */)
         OneWire::write_bit( (bitMask & v)?1:0);
     }
 
-    if ( !power) {
+    if ( power) {
         noInterrupts();
 
-        pinModeFastInput();
-        digitalWriteFastLow();
+        digitalWriteFastHigh();
+        pinModeFastOutput();        // Drive pin High when power is True
 
         interrupts();
     }
@@ -276,11 +281,11 @@ void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 
     for (uint16_t i = 0 ; i < count ; i++)
         write(buf[i]);
 
-    if (!power) {
+    if (power) {
         noInterrupts();
 
-        pinModeFastInput();
-        digitalWriteFastLow();
+        digitalWriteFastHigh();
+        pinModeFastOutput();        // Drive pin High when power is True
 
         interrupts();
     }
