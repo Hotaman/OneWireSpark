@@ -1,12 +1,11 @@
-Can anyone explain why I get this: @olet-toporkov olet-toporkov always appears as the updater when I push from my local repo? It's driving me nuts!
 
-Now supporting ALL Particle devices.
+Now supporting ALL Particle devices and the Redbear Duo.
 
 
 OneWireSpark
 ============
 
-Provides support for the Dallas One Wire protocol on Particle devices.
+Provides support for the Dallas One Wire (1-wire) protocol on Particle (and other) devices.
 
 Simply click the libs button in the web build tool at spark.io
 and add this lib to your project.
