@@ -2,6 +2,11 @@
 
 Particle Verison of OneWire Libary
 
+LukeUSMC 09/11/2016
+Removed Conditional fast pin access for Core and Photon, subsititute the pinSetFast,
+pinResetFast, pinReadFast functions. Using Particle Low-Level IO from pin_fast.h.
+Defaults to digitalRead/Write when not supported by a platform.
+
 Hotaman 2/1/2016
 Bit and Byte write functions have been changed to only drive the bus high at the end of a byte when requested.
 They no longer drive the bus for High bits when outputting to avoid a holy war.
@@ -16,10 +21,10 @@ Support for Photon added by Brendan Albano and cdrodriguez
 I made monor tweeks to allow use in the web builder and created this repository for
 use in the contributed libs list.
 
-6/2014 - Hotaman 
+6/2014 - Hotaman
 
-I've taken the code that Spark Forum user tidwelltimj posted 
-split it back into separte code and header files and put back in the 
+I've taken the code that Spark Forum user tidwelltimj posted
+split it back into separte code and header files and put back in the
 credits and comments and got it compiling on the command line within SparkCore core-firmware
 
 
@@ -162,30 +167,26 @@ uint8_t OneWire::reset(void)
     uint8_t retries = 125;
 
     noInterrupts();
-    pinModeFastInput();
+    pinReadFast(_pin);
     interrupts();
     // wait until the wire is high... just in case
     do {
         if (--retries == 0) return 0;
 
         delayMicroseconds(2);
-    } while ( !digitalReadFast());
+    } while ( !pinReadFast(_pin));
 
     noInterrupts();
-
-    digitalWriteFastLow();
-    pinModeFastOutput();   // drive output low
-
+    pinResetFast(_pin);
+    HAL_Pin_Mode(_pin, OUTPUT);
     interrupts();
+
     delayMicroseconds(480);
+
     noInterrupts();
-
-    pinModeFastInput();    // allow it to float
-
+    HAL_Pin_Mode(_pin, INPUT);    // allow it to float
     delayMicroseconds(70);
-
-    r =! digitalReadFast();
-
+    r =! pinReadFast(_pin);
     interrupts();
 
     delayMicroseconds(410);
@@ -198,12 +199,12 @@ void OneWire::write_bit(uint8_t v)
     if (v & 1) {
         noInterrupts();
 
-        digitalWriteFastLow();
-        pinModeFastOutput();   // drive output low
+        pinResetFast(_pin);
+        HAL_Pin_Mode(_pin, OUTPUT);   // drive output low
 
         delayMicroseconds(10);
 
-        pinModeFastInput();    // float high
+        HAL_Pin_Mode(_pin, INPUT);    // float high
 
         interrupts();
 
@@ -211,12 +212,12 @@ void OneWire::write_bit(uint8_t v)
     } else {
         noInterrupts();
 
-        digitalWriteFastLow();
-        pinModeFastOutput();   // drive output low
+        pinResetFast(_pin);
+        HAL_Pin_Mode(_pin, OUTPUT);   // drive output low
 
         delayMicroseconds(65);
 
-        pinModeFastInput();    // float high
+        HAL_Pin_Mode(_pin, INPUT);    // float high
 
         interrupts();
 
@@ -234,16 +235,16 @@ uint8_t OneWire::read_bit(void)
 
     noInterrupts();
 
-    digitalWriteFastLow();
-    pinModeFastOutput();
+    pinResetFast(_pin);
+    HAL_Pin_Mode(_pin, OUTPUT);
 
     delayMicroseconds(3);
 
-    pinModeFastInput();    // let pin float, pull up will raise
+    HAL_Pin_Mode(_pin, INPUT);    // let pin float, pull up will raise
 
     delayMicroseconds(10);
 
-    r = digitalReadFast();
+    r = pinReadFast(_pin);
 
     interrupts();
     delayMicroseconds(53);
@@ -258,7 +259,7 @@ uint8_t OneWire::read_bit(void)
 // go tri-state at the end of the write to avoid heating in a short or
 // other mishap.
 //
-void OneWire::write(uint8_t v, uint8_t power /* = 0 */) 
+void OneWire::write(uint8_t v, uint8_t power /* = 0 */)
 {
     uint8_t bitMask;
 
@@ -269,14 +270,14 @@ void OneWire::write(uint8_t v, uint8_t power /* = 0 */)
     if ( power) {
         noInterrupts();
 
-        digitalWriteFastHigh();
-        pinModeFastOutput();        // Drive pin High when power is True
+        pinSetFast(_pin);
+        HAL_Pin_Mode(_pin, OUTPUT);        // Drive pin High when power is True
 
         interrupts();
     }
 }
 
-void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 */) 
+void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 */)
 {
     for (uint16_t i = 0 ; i < count ; i++)
         write(buf[i]);
@@ -284,8 +285,8 @@ void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 
     if (power) {
         noInterrupts();
 
-        digitalWriteFastHigh();
-        pinModeFastOutput();        // Drive pin High when power is True
+        pinSetFast(_pin);
+        HAL_Pin_Mode(_pin, OUTPUT);       // Drive pin High when power is True
 
         interrupts();
     }
@@ -294,7 +295,7 @@ void OneWire::write_bytes(const uint8_t *buf, uint16_t count, bool power /* = 0 
 //
 // Read a byte
 //
-uint8_t OneWire::read() 
+uint8_t OneWire::read()
 {
     uint8_t bitMask;
     uint8_t r = 0;
@@ -306,7 +307,7 @@ uint8_t OneWire::read()
     return r;
 }
 
-void OneWire::read_bytes(uint8_t *buf, uint16_t count) 
+void OneWire::read_bytes(uint8_t *buf, uint16_t count)
 {
     for (uint16_t i = 0 ; i < count ; i++)
         buf[i] = read();
@@ -336,7 +337,7 @@ void OneWire::depower()
 {
     noInterrupts();
 
-    pinModeFastInput();
+    HAL_Pin_Mode(_pin, INPUT);
 
     interrupts();
 }
