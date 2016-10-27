@@ -25,10 +25,6 @@ power it gets more picky about the value.
 #include "OneWire/OneWire.h"  // Use this include for the Web IDE:
 // #include "OneWire.h" // Use this include for Particle Dev where everything is in one directory.
 
-
-// Comment this out for normal operation
-SYSTEM_MODE(SEMI_AUTOMATIC);  // skip connecting to the cloud for (Electron) testing
-
 OneWire ds = OneWire(D4);  // 1-wire signal on pin D4
 
 unsigned long lastUpdate = 0;
