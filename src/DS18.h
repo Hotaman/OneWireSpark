@@ -4,11 +4,11 @@
 #include "OneWire.h"
 
 enum DS18Type {
-  TYPE_UNKNOWN,
-  TYPE_DS1820,
-  TYPE_DS18B20,
-  TYPE_DS1822,
-  TYPE_DS2438
+  WIRE_UNKNOWN,
+  WIRE_DS1820,
+  WIRE_DS18B20,
+  WIRE_DS1822,
+  WIRE_DS2438
 };
 
 class DS18 {
@@ -31,7 +31,7 @@ public:
 
 private:
   void init();
-  
+
   OneWire _wire;
   bool _parasitic;
   uint16_t _conversionTime;

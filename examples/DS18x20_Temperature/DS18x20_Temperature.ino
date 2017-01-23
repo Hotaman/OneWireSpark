@@ -70,10 +70,10 @@ void printDebugInfo() {
   // Print the sensor type
   const char *type;
   switch(sensor.type()) {
-    case TYPE_DS1820: type = "DS1820"; break;
-    case TYPE_DS18B20: type = "DS18B20"; break;
-    case TYPE_DS1822: type = "DS1822"; break;
-    case TYPE_DS2438: type = "DS2438"; break;
+    case WIRE_DS1820: type = "DS1820"; break;
+    case WIRE_DS18B20: type = "DS18B20"; break;
+    case WIRE_DS1822: type = "DS1822"; break;
+    case WIRE_DS2438: type = "DS2438"; break;
     default: type = "UNKNOWN"; break;
   }
   Serial.print(type);

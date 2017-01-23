@@ -16,7 +16,7 @@ void DS18::init() {
   _celsius = 0;
   memset(_addr, 0, sizeof(_addr));
   memset(_data, 0, sizeof(_data));
-  _type = TYPE_UNKNOWN;
+  _type = WIRE_UNKNOWN;
   _searchDone = false;
   _crcError = false;
 }
@@ -50,11 +50,11 @@ bool DS18::read(uint8_t addr[8]) {
   // the first ROM byte indicates which chip
   // Return if this is an unknown chip
   switch (addr[0]) {
-    case 0x10: _type = TYPE_DS1820; break;
-    case 0x28: _type = TYPE_DS18B20; break;
-    case 0x22: _type = TYPE_DS1822; break;
-    case 0x26: _type = TYPE_DS2438; break;
-    default:   _type = TYPE_UNKNOWN; return false;
+    case 0x10: _type = WIRE_DS1820; break;
+    case 0x28: _type = WIRE_DS18B20; break;
+    case 0x22: _type = WIRE_DS1822; break;
+    case 0x26: _type = WIRE_DS2438; break;
+    default:   _type = WIRE_UNKNOWN; return false;
   }
 
   // Read the actual temperature!!!
@@ -85,7 +85,7 @@ bool DS18::read(uint8_t addr[8]) {
   _wire.reset();
   _wire.select(_addr);
   _wire.write(0xBE,0);         // Read Scratchpad
-  if (_type == TYPE_DS2438) {
+  if (_type == WIRE_DS2438) {
     _wire.write(0x00,0);       // The DS2438 needs a page# to read
   }
 
@@ -105,13 +105,13 @@ bool DS18::read(uint8_t addr[8]) {
   // be stored to an "int16_t" type, which is always 16 bits
   // even when compiled on a 32 bit processor.
   _raw = (_data[1] << 8) | _data[0];
-  if (_type == TYPE_DS2438) {
+  if (_type == WIRE_DS2438) {
     _raw = (_data[2] << 8) | _data[1];
   }
   byte cfg = (_data[4] & 0x60);
 
   switch (_type) {
-    case TYPE_DS1820:
+    case WIRE_DS1820:
       _raw = _raw << 3; // 9 bit resolution default
       if (_data[7] == 0x10) {
         // "count remain" gives full 12 bit resolution
@@ -119,8 +119,8 @@ bool DS18::read(uint8_t addr[8]) {
       }
       _celsius = (float)_raw * 0.0625;
       break;
-    case TYPE_DS18B20:
-    case TYPE_DS1822:
+    case WIRE_DS18B20:
+    case WIRE_DS1822:
       // at lower res, the low bits are undefined, so let's zero them
       if (cfg == 0x00) _raw = _raw & ~7;  // 9 bit resolution, 93.75 ms
       if (cfg == 0x20) _raw = _raw & ~3; // 10 bit res, 187.5 ms
@@ -129,7 +129,7 @@ bool DS18::read(uint8_t addr[8]) {
       _celsius = (float)_raw * 0.0625;
       break;
 
-    case TYPE_DS2438:
+    case WIRE_DS2438:
       _data[1] = (_data[1] >> 3) & 0x1f;
       if (_data[2] > 127) {
         _celsius = (float)_data[2] - ((float)_data[1] * .03125);

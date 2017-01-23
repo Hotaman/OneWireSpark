@@ -97,7 +97,7 @@ See the datasheet for your device to decode this.
 
 `DS18Type type = sensor.type();`
 
-The type of the last read device. One of `TYPE_DS1820`, `TYPE_DS18B20`, `TYPE_DS1822`, `TYPE_DS2438` or `TYPE_UNKNOWN` if the device is not a temperature sensor, no device was found or the search is done.
+The type of the last read device. One of `WIRE_DS1820`, `WIRE_DS18B20`, `WIRE_DS1822`, `WIRE_DS2438` or `WIRE_UNKNOWN` if the device is not a temperature sensor, no device was found or the search is done.
 
 ## `raw()`
 
