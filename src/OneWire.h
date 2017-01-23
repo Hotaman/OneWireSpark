@@ -33,6 +33,7 @@ private:
 
 /**************Conditional fast pin access for Core and Photon*****************/
   #if PLATFORM_ID == 0 // Core
+    // Fast pin access for STM32F1xx microcontroller
     inline void digitalWriteFastLow() {
       PIN_MAP[_pin].gpio_peripheral->BRR = PIN_MAP[_pin].gpio_pin;
     }
@@ -88,8 +89,10 @@ private:
       return GPIO_ReadInputDataBit(PIN_MAP[_pin].gpio_peripheral, PIN_MAP[_pin].gpio_pin);
     }
 
-  //#elif PLATFORM_ID == 6 || PLATFORM_ID == 8 || PLATFORM_ID == 10 // Photon(P0),P1,Electron
-  #else // just do this for everything else until they change it again
+  // Assume all other platforms are STM32F2xx until proven otherwise
+  //#elif PLATFORM_ID == 6 || PLATFORM_ID == 8 || PLATFORM_ID == 10  // Photon(P0),P1,Electron
+  #else
+    // Fast pin access for STM32F2xx microcontroller
     STM32_Pin_Info* PIN_MAP = HAL_Pin_Map(); // Pointer required for highest access speed
 
     inline void digitalWriteFastLow() {
@@ -234,4 +237,4 @@ private:
 #endif
 };
 
-#endif
+#endif // OneWire_h
