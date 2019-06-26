@@ -4,14 +4,31 @@ The One Wire (1-Wire) protocol is used in the popular DS18B20 temperature sensor
 
 This library implements the Dallas One Wire (1-wire) protocol on the Particle Photon, Electron, Core, P0/P1, Red Bear Duo and compatible devices.
 
+## Known limitations
+
+Currently, the new Mesh networking features will cause bit errors due to higher order non-maskable interupts. Do not attempt to enumerate devices with mesh turned on, it will most likely fail. Once enumerated, with mesh on, you will get regular CRC errors so make sure your code can handdle them corectly for your data requirements. 
+
+## History
+
+This library was originally written in ML by Me (Hotaman) in the earily 1990s for Pic processors when Dallas Semiconductor introduced the 1-wire protocol on their iButtons. I've ported the code to AVR and many others. I have implemented this code in hand coded ML (Pic, AVR), Assembly (many flavors), Forth, C, and C++. It has been copied/forked by many since those earily days of microcontrollers.
+
+This implementation in C++ for Particle.io is the result of effort by many talented coders. I thank you all for your help in making this one of the most popular libs for Particle.io supported devices. Support for this lib was turned over to Particle.io a year or two ago. The current 'Official' version can be found in their fork.
+
+Again, Many thanks to all of you who help me keep this code base current! Pull requests are always welcome.
+
 ## Usage
 
 If you are using a DS18B20, DS1820 or DS1822 temperature sensor, you can simply use the `DS18` object to read temperature.
 
 Connect sensor:
 - pin 1 (1-Wire ground) to ground.
-- pin 2 (1-Wire signal) to `D0` (or another pin) with a 2K-10K resistor to pin 3.
-- pin 3 (1-Wire power) to 3V3 or VIN.
+- pin 2 (1-Wire signal) to `D0` (or another pin) with a 1K-10K resistor to 3V3.
+
+    note: Resistor value _can_ be critical depending on: Bus length, number of devices, parasitic mode.
+         Start with 1-3 powered devices on a short (<2') bus with 10K. Expand out once you have that working well, reducing
+         the resistor value as required to keep the signal clean.
+
+- pin 3 (1-Wire power) to 3V3 - Optional, not required for parasitic operation. 
 
 ```
 #include "DS18.h"
