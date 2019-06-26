@@ -33,6 +33,7 @@ private:
 
 /**************Conditional fast pin access for Core and Photon*****************/
   #if PLATFORM_ID == 0 // Core
+    // Fast pin access for STM32F1xx microcontroller
     inline void digitalWriteFastLow() {
       PIN_MAP[_pin].gpio_peripheral->BRR = PIN_MAP[_pin].gpio_pin;
     }
@@ -88,8 +89,9 @@ private:
       return GPIO_ReadInputDataBit(PIN_MAP[_pin].gpio_peripheral, PIN_MAP[_pin].gpio_pin);
     }
 
-  //#elif PLATFORM_ID == 6 || PLATFORM_ID == 8 || PLATFORM_ID == 10 // Photon(P0),P1,Electron
-  #else // just do this for everything else until they change it again
+  // Assume all other platforms are STM32F2xx until proven otherwise
+  #elif PLATFORM_ID == 6 || PLATFORM_ID == 8 || PLATFORM_ID == 10  // Photon(P0),P1,Electron
+    // Fast pin access for STM32F2xx microcontroller
     STM32_Pin_Info* PIN_MAP = HAL_Pin_Map(); // Pointer required for highest access speed
 
     inline void digitalWriteFastLow() {
@@ -118,8 +120,31 @@ private:
       return HAL_GPIO_Read(_pin);
     }
 
-  //#else  // no need for this right now
-    //#error "*** PLATFORM_ID not supported by this library. PLATFORM should be Core, Photon, P1 or Electron ***"
+  #else
+
+    inline void digitalWriteFastLow() {
+      pinResetFast(_pin);
+    }
+
+    inline void digitalWriteFastHigh() {
+      pinSetFast(_pin);
+    }
+
+    inline void pinModeFastOutput(void){
+      // This could probably be speed up by digging a little deeper past
+      // the HAL_Pin_Mode function.
+      HAL_Pin_Mode(_pin, OUTPUT);
+    }
+
+    inline void pinModeFastInput(void){
+      // This could probably be speed up by digging a little deeper past
+      // the HAL_Pin_Mode function.
+      HAL_Pin_Mode(_pin, INPUT);
+    }
+
+    inline uint8_t digitalReadFast(void){
+      return pinReadFast(_pin);
+    }
   #endif
 /**************End conditional fast pin access for Core and Photon*************/
 
@@ -234,4 +259,4 @@ private:
 #endif
 };
 
-#endif
+#endif // OneWire_h

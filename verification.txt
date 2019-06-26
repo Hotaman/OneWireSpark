@@ -1,0 +1,17 @@
+# Test powered sensor
+
+Connect a DS18B20 temperature sensor to a Photon on a breadboard.
+Connect pin 1 to D3, pin 2 to D4, pin 3 to D5, 10 k ohm resistor between pin 2 and 3.
+Flash DS18x20_Temperature.ino example.
+Open serial conenction and check that the temperature is read.
+
+Repeat for Core and Electron
+
+# Test parasitic sensor
+
+Connect a DS18B20-PAR temperature sensor to a Photon on a breadboard.
+Connect pin 1 to GND, pin 2 to D4, pin 3 to VIN, 1.5 k ohm resistor between pin 2 and VIN.
+Flash DS18x20_Temperature.ino example.
+Open serial conenction and check that the temperature is read.
+
+Repeat for Core and Electron
