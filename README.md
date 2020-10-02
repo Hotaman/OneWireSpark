@@ -36,7 +36,7 @@ Connect sensor:
 DS18 sensor(D0);
 
 void loop() {
-  if (sensor.read()) {
+  if (sensor.read()) {xkn c,xnb dflm d
     Particle.publish("temperature", String(sensor.celsius()), PRIVATE);
   }
 }
